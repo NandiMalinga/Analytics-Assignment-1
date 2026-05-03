@@ -1,0 +1,563 @@
+\documentclass[11pt]{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlsng}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hldef}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+% Page layout
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{eso-pic}
+% Math
+\usepackage{amsmath, amssymb}
+% for references
+\usepackage{url}
+\usepackage{natbib}
+\bibliographystyle{apalike}
+% Graphics
+\usepackage{graphicx}
+\usepackage{caption}
+\captionsetup{font=footnotesize, skip=1pt}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{siunitx}
+% Typography
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{parskip}      % Removes paragraph indent
+\usepackage{listings}     % For code-looking font
+
+% Section formatting
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\Large\bfseries}
+  {}
+  {0em}
+  {}
+
+\DeclareMathOperator*{\argmax}{arg\, max}
+
+\usepackage{eso-pic}
+\usepackage{calc}
+
+% Top-left logo
+\AddToShipoutPictureBG*{%
+  \put(1cm, \paperheight-3cm){\includegraphics[width=0.15\textwidth]{UCT-logo.png}}%
+}
+
+% Top-right logo  
+\AddToShipoutPictureBG*{%
+  \put(\paperwidth-3.3cm, \paperheight-3cm){\includegraphics[width=0.15\textwidth]{stats_logo.png}}%
+}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries Analytics \par}
+    \vspace{2cm}
+    
+    {\LARGE\bfseries Assignment One\par}
+    \vspace{2cm}
+    
+    {\LARGE Nandi Malinga\par}
+    \vspace{0.2cm}
+    
+    {\LARGE Topollo Mokhatla\par}
+    \vspace{3cm}
+    
+    {\large 23rd March 2026\par}
+\end{titlepage}
+
+\section*{Question 1}
+Cape Town is experiencing a pronounced housing affordability crisis, driven in part by 
+rising short-term rental demand from digital nomads and the relative affordability of 
+local assets due to a weakened Rand\citep{Moodley2025}. This has 
+incentivised landlords to shift properties away from the long-term rental market, 
+exerting upward pressure on rents\citep{Moodley2025}. These dynamics 
+are particularly concerning on Airbnb, where hosts are not required to disclose the 
+number of listings they operate, obscuring the extent of multi-property ownership and 
+complicating efforts to assess market concentration. 
+We therefore aim to distinguish between typical hosts and those operating 
+disproportionately large portfolios using observable listing-level features, addressing 
+the informational gaps created by this lack of platform transparency.
+
+
+The response variable \texttt{highhost} was constructed by thresholding 
+\texttt{host\_listings\_count}, classifying a host as ``high'' if they operate nine or 
+more listings. This threshold is not arbitrary: the median host in the Cape Town Airbnb 
+market holds three listings in the training data, so the cutoff corresponds to three times 
+the median — defining a \texttt{highhost} as one operating at least three times as many 
+listings as half the platform's host population. Lowering the threshold would marginally 
+improve class balance but at the cost of conflating low hosts with genuine \texttt{highhost}s, undermining the conceptual validity of \texttt{highhost} 
+as a classification target. The chosen threshold therefore represents a deliberate 
+trade-off between statistical and substantive considerations, yielding a class distribution 
+of approximately 69.5\%:30.5\% (low:high) in the training data. While not perfectly 
+balanced, this is sufficient enough to prevent trivial majority-class exploitation
+- as a naive classifier would achieve 69.5\% Accuracy, and this constitutes the relevant 
+baseline for model evaluation.
+
+We selected ten covariates on substantive grounds. \texttt{host\_since} was 
+feature-engineered to retain only the year of registration, preserving tenure information 
+while discarding redundant date-level granularity. \texttt{neighbourhood\_ward} was 
+preferred over raw latitude and longitude coordinates, as ward boundaries capture 
+administratively meaningful demand-side variation more interpretably than continuous 
+spatial coordinates. The remaining covariates were retained as plausible proxies for 
+either the operational scale or commercial orientation of a host, as detailed below:
+
+\begin{description}
+\item[\texttt{host\_acceptance\_rate}:] Reflects operational capacity and the extent to which hosting is managed commercially.
+\item[\texttt{host\_is\_superhost}:] Awarded on sustained performance metrics; likely correlated with the systematic management characteristic of \texttt{highhost}s.
+\item[\texttt{room\_type}:] Entire property listings are more consistent with commercial operation than private or shared rooms.
+\item[\texttt{accommodates}:] Larger capacity properties are more viable as commercial listings.
+\item[\texttt{bedrooms}:] Further characterises listing scale, closely related to capacity.
+\item[\texttt{price}:] Pricing strategy may differ systematically between casual and commercial hosts.
+\item[\texttt{availability\_30}:] Active short-term availability reflects consistent listing management, expected to be higher among \texttt{highhost}s.
+\item[\texttt{number\_of\_reviews}:] Proxies listing activity and booking frequency, both elevated for commercially-operated listings.
+\end{description}
+
+
+\section*{Question 2}
+Having identified the restricted set of covariates, the remaining modelling procedure is largely data-driven, with explicit decision rules guiding selection. 
+
+We consider four model classes: Regularised Elastic-net Logistic Regression, Random 
+Forest, Gradient Boosted Trees, and K-Nearest Neighbours. Within each class, 
+hyperparameters are selected by maximising 10-fold cross-validation Accuracy (first 
+decision rule), after which the four best models from each model class are ranked across five metrics: 
+Accuracy, F1 score, Precision, Recall, and Specificity (second decision rule). Accuracy 
+and Recall are afforded primacy in the final model selection given the asymmetric costs of 
+misclassification in this context: since Airbnb does not publicly disclose host portfolio 
+information, false negatives — failing to identify a \texttt{highhost} — are more costly 
+than false positives, as they directly reproduce the platform opacity this analysis seeks 
+to address.
+
+These decision rules are but a guide, and may need adjustment as in some cases interpretability could be prioritised over predictive performance; resulting in a \textit{slightly} worse performing model being preferred over the best.
+
+\subsection*{a) Model Development}
+\subsubsection*{Regularised Elastic-net Logistic Regression}
+The elastic-net approach combines Ridge ($L_2$) and Lasso ($L_1$) regularisation, balancing coefficient shrinkage to reduce variance and retain correlated variables, while encouraging sparsity to eliminate less important predictors. This helps manage the high dimensionality of our dataset and improve interpretability. 
+
+We generate $\alpha$ values over 
+$[0, 1]$ in 0.1 increments, and fit them to \texttt{cv.glmnet}, using a regularised logistic regression model and optimising for $\lambda$ using 10-fold cross-validation. In particular, we care about two $\lambda$ candidates 
+per $\alpha$: \texttt{lambda.min}, the $\lambda$ minimising CV misclassification error, 
+and \texttt{lambda.1se}, the largest $\lambda$ within one standard error of that minimum.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!t]
+\includegraphics[width=\maxwidth]{figure/elastic-net-1} \caption[Elastic-net Accuracy (Cross-Validation) Across the Hyperparameter Space]{Elastic-net Accuracy (Cross-Validation) Across the Hyperparameter Space}\label{fig:elastic-net}
+\end{figure}
+
+\end{knitrout}
+The best $\alpha$ is chosen by selecting the model that has the greatest cross validation Accuracy at its \texttt{lambda.min} or \texttt{lambda.1se} value.  
+
+For our dataset, we selected \texttt{lambda.1se} to prioritise parsimony. Given the large number of predictors, this decision promotes a simpler and more interpretable model, while avoiding a substantial loss in Accuracy. The resulting model shrinks 37 feature coefficients to 0, and achieves a cross-validation Accuracy of 69.75\%\textsuperscript{\ref{tab:model_metrics}}, with optimal hyperparameters \texttt{$\alpha = 0.51$} and \texttt{$\lambda_{1\text{se}} = 0.00996$}. Predictions on the training data are summarised in Table \ref{tab:confusion_elasticnet}. The elastic-net model’s cross-validation Accuracy only barely edges that of a naive classifier (predicting all observations as not \texttt{highhost}). The confusion matrix shows many false negatives, indicating a strong bias towards the majority class.
+
+\begin{table}[htbp]
+\centering
+\caption{Best Elastic-Net Model Confusion Matrix}
+\label{tab:confusion_elasticnet}
+\begin{tabular}{llcc}
+\toprule
+& & \multicolumn{2}{c}{\textbf{Observed}} \\
+\cmidrule(lr){3-4}
+& & \textbf{Not Highhost} & \textbf{Highhost} \\
+\midrule
+\multirow{2}{*}{\textbf{Predicted}}
+& \textbf{Not Highhost} & 5499 \small{(TN)} & 2355 \small{(FN)} \\[4pt]
+& \textbf{Highhost}     & 65 \small{(FP)}   & 81 \small{(TP)} \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize{\textit{Note:} TN = True Negative, FN = False Negative, FP = False Positive, TP = True Positive.}
+\end{table}
+\newpage
+\subsubsection*{Random Forest}
+
+The second model we applied was a random forest approach, which is a tree-based method designed to reduce the variability of predictions, particularly in datasets with correlated predictors. It involves bagging, which grows many decision trees on bootstrapped samples of the data. However, each tree only considers a random subset of predictors at each split. This reduces correlation between trees that occurs when a few strong features dominate early splits. By averaging predictions across all trees, the model reduces noise and produces more stable predictions. 
+
+This approach is well suited to our dataset due to the large number of features, as the combination of bootstrapping and random feature selection allows different trees to explore different subsets of the data and in the feature space while remaining robust. This encourages a wider range of covariates to contribute to the model and reduces correlation between trees, limiting the dominance of any single covariate. The averaging process helps prevent overfitting by smoothing noise from individual trees. Although random forests are often considered ``black- box" algorithms, techniques such as variable importance plots can provide insight into the most influential covariates. 
+
+Our random forest model \texttt{(mod\_randomforest)} was trained with 250 trees, and uses 10-fold cross-validation to tune two hyperparameters: 
+\begin{itemize}
+    \item \texttt{mtry} - the number of variables considered at each split (tested across all its possible values from 1 to 74), and 
+    \item \texttt{min.node.size} - the control for the depth of the tree (tested over values 1, 5 and 20).
+\end{itemize}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!t]
+\includegraphics[width=\maxwidth]{figure/randomforest-1} \caption[Random Forest Accuracy (Cross-Validation) Across the Hyperparameter Space]{Random Forest Accuracy (Cross-Validation) Across the Hyperparameter Space}\label{fig:randomforest}
+\end{figure}
+
+\end{knitrout}
+As represented in Figure \ref{fig:randomforest}, the best model was achieved with \texttt{mtry} = 28 and \texttt{min.node.size} = 1, yielding a cross-validated Accuracy performance of 86.64\%\textsuperscript{\ref{tab:model_metrics}} and OOB prediction error of 9.99\%.
+\newpage
+\subsubsection*{Gradient Boosted Model}
+Unlike random forests, which grow trees independently, boosting constructs trees sequentially. At each iteration, a small decision tree is fitted to the pseudo-residuals of the current model, representing the model's errors at that stage. Each tree is then added to the model scaled by a learning rate $\lambda$, progressively correcting the errors of preceding iterations. For this data, the model effectively uses logistic regression to model probabilities under a Bernoulli loss function.
+
+For our gradient boosted tree model \texttt{(mod\_gbm)}, we use 10-fold cross-validation to tune the following hyperparameters:
+
+\begin{itemize}
+    \item \texttt{n.trees} - represents the number of sequential trees fitted to updated residuals, over the search space 5 000, 10 000, and 20 000. Increasing the number of trees reduces training error but may eventually lead to overfitting.
+    
+    \item \texttt{interaction.depth} - maximum tree depth (tested over values 1, 2, and 5). This determines the level of interaction between variables that can be captured.
+    
+    \item \texttt{shrinkage} - the learning rate (tested at values 0.1 and 0.01).
+\end{itemize}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!t]
+\includegraphics[width=\maxwidth]{figure/gbm-1} \caption[Gradient Boosted Model Accuracy (Cross-Validation) Across the Hyperparameter Space ]{Gradient Boosted Model Accuracy (Cross-Validation) Across the Hyperparameter Space }\label{fig:gbm}
+\end{figure}
+
+\end{knitrout}
+The high-dimensionality of our data is handled well by this approach. With 74 covariates in our dataset, GBM efficiently selects features by choosing tree splits that most reduce prediction error. As a result, only 42 covariates were found to have a non-zero influence on the response, and are retained across trees to explain the remaining structure in the residuals. Furthermore, by allowing multiple splits within each tree, the model can capture important interactions between variables without having to compute them directly. For example, interactions between \texttt{host\_since\_year} and \texttt{number\_of\_reviews} may influence \texttt{highhost} classification, since a more experienced host with a greater number of reviews may be considered more established and reliable. 
+\newpage
+From Figure \ref{fig:gbm} , we observe that the best model selects \texttt{n.trees} = 10 000, with \texttt{shrinkage} = 0.1 and \texttt{interaction.depth} = 5, to obtain an Accuracy of 85.66\% \textsuperscript{\ref{tab:model_metrics}}.
+
+\subsubsection*{K-nearest neighbours (KNN)}
+Finally, it would be remiss not to consider the K-nearest neighbours (KNN) algorithm for this dataset, given its simplicity and surprisingly strong performance in a variety of contexts. The KNN algorithm operates by storing the training observations and predicting the class of an observation based on the majority class among its \texttt{k} nearest neighbours.
+
+A key challenge with this approach is the absence of an inherent feature selection mechanism, making it unclear which predictors contribute most to the variability of \texttt{highhost}. Given the large number of features, the model is susceptible to the ``curse of dimensionality", where distance-based methods become less effective as the feature space grows and data becomes increasingly sparse. To mitigate this issue, we restrict our feature set to those whose coefficients did not shrink to 0 (or “.”) in the elastic-net model. This results in a reduced set of 40 features. The advantage of this approach is that feature selection is data-driven, retaining only covariates that have demonstrated predictive relevance. For categorical covariates, dummy variables are created for each level. As indicated by the elastic-net results, some dummy variables associated with the \texttt{neighbourhood\_ward} feature are excluded, further reducing dimensionality.
+
+In addition, it is essential to scale the data, as KNN relies on distance calculations. Standardisation ensures that all predictors contribute equally to the distance metric, preventing features with larger scales from dominating. The same transformations applied to the training data are consistently applied to the test data.
+
+To tune the hyperparameter \texttt{k}, we perform 10-fold cross-validation over the limited search space $ \texttt{k} = 1,…,20 $. As shown in Figure \ref{fig:knn}, the highest cross-validation Accuracy of 76.89\%\textsuperscript{\ref{tab:model_metrics}} is achieved at \texttt{k} = 1, making it the optimal choice. This is unexpected, as \texttt{k} = 1 is typically associated with high variance. Additionally, increasing \texttt{k} = 2 results in a sharp drop in Accuracy to below 73.5\%, before rising above 75\% at \texttt{k}.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[H]
+\includegraphics[width=\maxwidth]{figure/knn-1} \caption[K Nearest Neighbours Accuracy (Cross-Validation) Plot Across the Hyperparameter Space]{K Nearest Neighbours Accuracy (Cross-Validation) Plot Across the Hyperparameter Space}\label{fig:knn}
+\end{figure}
+
+\end{knitrout}
+\subsection*{b) Summary of Relevant Metrics}
+\subsubsection*{Table of Metrics}
+Having fitted each of the models to the data, we now collate the different relevant metrics on Table \ref{tab:model_metrics} with the goal of selecting a final model in mind.
+\begin{table}[h]
+\centering
+\caption{Metrics for specified models}
+\label{tab:model_metrics}
+\begin{tabular}{lcccccc}
+\toprule
+Model & Accuracy & F1 Score & Precision & Recall & Specificity & AUROC \\
+\midrule
+Elastic-net          & 0.6975 & 0.0627 & 0.5549 & 0.0333 & 0.9883 & 0.7610 \\
+Random Forest        & 0.8664 & 0.7705 & 0.8077 & 0.7365 & 0.9233 & 0.9264 \\
+Gradient Boosted     & 0.8566 & 0.7560 & 0.7845 & 0.7295 & 0.9123 & 0.9178 \\
+K-nearest neighbours & 0.7689 & 0.6527 & 0.6394 & 0.6665 & 0.8184 & 0.8263 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{Visual Illustration of Results}
+Figure \ref{fig:summary_plot} summarises the metrics from Table \ref{tab:model_metrics}. Random forest performs best overall, with gradient boosting close behind. Elastic-net, despite high Specificity, has low F1 and Recall, indicating poor identification of \texttt{highhost}.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[H]
+\includegraphics[width=\maxwidth]{figure/summary_plot-1} \caption[Model Performance Across Evaluation Metrics]{Model Performance Across Evaluation Metrics}\label{fig:summary_plot}
+\end{figure}
+
+\end{knitrout}
+
+\subsection*{c) Model Selection}
+The Random Forest model was selected as the final classifier based on its superior performance 
+across the two metrics most critical to our objectives: Accuracy and Recall. Given the training 
+data's class distribution (a 69.5\%:30.5\% split between not \texttt{highhost}s and 
+\texttt{highhost}s), a naive majority-class classifier would achieve 69.5\% Accuracy. The 
+Random Forest substantially exceeds this baseline at 86.64\%\textsuperscript{\ref{tab:model_metrics}}, 
+demonstrating genuine learning rather than exploitation of class imbalance.
+
+Of greater substantive importance is Recall, given the asymmetric error costs inherent to this 
+problem. As outlined earlier, a false negative - failing to not identify a genuine \texttt{highhost} directly undermines the 
+study's aim. 
+False positives, while undesirable, carry a lower informational cost. The Random Forest achieves 
+a Recall of 73.65\%\textsuperscript{\ref{tab:model_metrics}}, the highest among all models 
+evaluated, making it the most appropriate choice given our primary detection objective.
+
+This selection is reinforced by the model's performance on secondary metrics. Its F1 score of 
+77.05\%\textsuperscript{\ref{tab:model_metrics}} reflects an effective balance between Precision 
+and Recall, while its AUROC of 92.64\%\textsuperscript{\ref{tab:model_metrics}} confirms that 
+strong class separation is maintained across all decision thresholds, not merely the default 
+$\tau = 0.5$. High Specificity of 92.33\%\textsuperscript{\ref{tab:model_metrics}} indicates 
+that false positives are well-controlled, though this was not a primary selection criterion.
+
+The performance of alternative models contextualises the Random Forest's superiority. The 
+Gradient Boosted model performs competitively, with Accuracy of 
+85.66\%\textsuperscript{\ref{tab:model_metrics}} and Recall of 
+72.95\%\textsuperscript{\ref{tab:model_metrics}}, but is marginally outperformed on both by Random Forest. K-nearest neighbours lags more meaningfully, with Accuracy of 
+76.89\%\textsuperscript{\ref{tab:model_metrics}}, Recall of 
+66.65\%\textsuperscript{\ref{tab:model_metrics}}, and AUROC of 
+82.63\%\textsuperscript{\ref{tab:model_metrics}}, indicating weaker overall discriminative 
+capacity. Elastic-net performs poorest among the four: its Accuracy of
+69.75\%\textsuperscript{\ref{tab:model_metrics}} is only marginally above the naive baseline (69.5\%), its Recall 
+of just 3.33\%\textsuperscript{\ref{tab:model_metrics}} renders it effectively unable to 
+detect \texttt{highhost}s, and its F1 score of 
+6.27\%\textsuperscript{\ref{tab:model_metrics}} confirms that the \texttt{lambda.1se} 
+regularisation penalty has produced a model that is too sparse to be useful in this setting. 
+The Random Forest thus represents the most balanced and contextually appropriate choice.
+
+\section*{Question 3}
+The response variable \texttt{highhost} is by design imbalanced, and this is a deliberate 
+trade-off to preserve the conceptual integrity of the classification. A consequence of this 
+is that the default decision threshold of $\tau = 0.5$ is not well-suited, as it implicitly 
+treats the two classes symmetrically in a setting where they are not. We therefore turn to 
+threshold calibration on the already-selected Random Forest, iterating over $\tau \in [0.01, 
+0.99]$ in increments of 0.01 and selecting the threshold that maximises the F1 score on the 
+cross-validated training predictions. The F1 score is the preferred criterion here because, 
+as the harmonic mean of Precision and Recall, it penalises models that resolve class imbalance 
+by biasing predictions toward either class.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{figure/CVerror-1} 
+
+}
+
+\caption[F1 Score Across Decision Thresholds]{F1 Score Across Decision Thresholds}\label{fig:CVerror}
+\end{figure}
+
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[!t]
+
+{\centering \includegraphics[width=\maxwidth]{figure/CV_ROC-1} 
+
+}
+
+\caption[Validation Set ROC Curve – Random Forest]{Validation Set ROC Curve – Random Forest}\label{fig:CV ROC}
+\end{figure}
+
+\end{knitrout}
+The optimal threshold was found to be $\tau = 0.41$, 
+marginally below the default, reflecting the asymmetric cost structure of the problem: by 
+lowering the decision boundary, the model is more willing to classify a host as a 
+\texttt{highhost}. Moreover, the AUROC stands at an impressive 92.64\%\textsuperscript{\ref{tab:rf_threshold}}.
+\newpage
+Table \ref{tab:rf_threshold} presents the performance of this optimised decision rule 
+($\tau = 0.41$) across both the cross-validated training predictions and the held-out 
+test set. While training performance is encouraging (the optimised threshold even 
+marginally improves upon $\tau = 0.5$ on Recall; a metric of particular substantive 
+importance in this context despite not being the direct optimisation criterion) the 
+model generalises poorly to unseen data. Test set Accuracy of 76.70\%\textsuperscript{\ref{tab:rf_threshold}} 
+represents only a 7.20 percentage point improvement over the naive majority-class baseline, 
+a modest gain that falls well short of the model's cross-validated performance. More 
+concerningly, test set Recall of 55.12\%\textsuperscript{\ref{tab:rf_threshold}} indicates 
+that the optimised threshold correctly identifies only approximately half of true 
+\texttt{highhost}s on unseen data. This is a meaningful deterioration from the training Recall of 
+82.22\%\textsuperscript{\ref{tab:rf_threshold}}, which suggests that the threshold calibration has 
+overfit to the cross-validated training predictions and does not transfer reliably to the 
+test set.
+
+\begin{table}[htbp]
+\centering
+\caption{Random Forest: Training vs Test at Optimised Threshold}
+\label{tab:rf_threshold}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{Training} ($\tau = 0.41$) & \textbf{Test} ($\tau = 0.41$) \\
+\midrule
+Accuracy    & 0.8582 & 0.7670 \\
+F1          & 0.7794 & 0.5927 \\
+Precision   & 0.7408 & 0.6408 \\
+Recall      & 0.8222 & 0.5512 \\
+Specificity & 0.8740 & 0.8628 \\
+AUROC       & 0.9264 & 0.8283 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize{\textit{Note:} $\tau$ denotes the classification threshold. The optimised threshold $\tau = 0.41$ was selected by maximising F1 on the cross-validated training predictions.}
+\end{table}
+ 
+
+\section*{Question 4}
+\subsection*{a) Variable Importance Plots}
+\subsubsection*{Impurity Variable Importance}
+Impurity Variable importance is defined as the mean total reduction in RSS contributed by each feature across all trees, capturing how useful a variable is for splitting during tree construction rather than for out-of-sample prediction. The RSS-based criterion is known to favour continuous features over categorical or binary ones, since continuous variables provide more candidate split points and therefore more opportunities to reduce impurity. Consistent with this, the Random Forest's five highest-ranked features are all continuous - an artefact of the tree construction mechanism rather than a definitive signal of true predictive relevance.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[H]
+\includegraphics[width=\maxwidth]{figure/impurity-1} \caption[Impurity-Based Variable Importance Plot]{Impurity-Based Variable Importance Plot}\label{fig:impurity}
+\end{figure}
+
+\end{knitrout}
+From Figure \ref{fig:impurity}, \texttt{host\_acceptance\_rate} is the most important feature for discriminating between levels of \texttt{highhost} within the tree-building process. It is followed by \texttt{price}, with \texttt{host\_since\_year} ranking third. 
+The ranking of \texttt{price} is particularly illustrative of this, despite its prominence here, the earlier Elastic-net model excluded \texttt{price} via the Lasso penalty (under both the minimum and one-standard-error selections). This suggests that while \texttt{price} is effective for partitioning the feature space during tree growth, this should not be interpreted as evidence of strong predictive power in a generalisation context.
+
+\subsubsection*{Permutation Variable Importance}
+Permutation importance is defined as the average increase in model misclassification error 
+when a feature's values are randomly permuted across the out-of-bag sample, thereby 
+severing its relationship with \texttt{highhost}. Unlike impurity-based importance, which 
+reflects a feature's contribution to in-sample split quality, permutation importance 
+captures the deterioration in predictive performance on unseen data — making it a more 
+reliable proxy for out-of-sample relevance and one that is not susceptible to the 
+continuous-feature bias that afflicts RSS-based rankings.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[H]
+\includegraphics[width=\maxwidth]{figure/permutation-1} \caption[Permutation-Based Variable Importance Plot]{Permutation-Based Variable Importance Plot}\label{fig:permutation}
+\end{figure}
+
+\end{knitrout}
+From Figure \ref{fig:permutation}, \texttt{host\_acceptance\_rate} again emerges as the most consequential 
+feature: permuting its values produces the largest average increase in misclassification 
+error across the ensemble. Its dominance under both importance criteria suggests that its 
+role is not merely an artefact of the impurity-based criterion's preference for continuous 
+features, but reflects genuine predictive relevance. \texttt{neighbourhood\_ward} ranks 
+second, a result more aligned with the broader pattern observed across the other fitted 
+models; this ranking carries greater substantive credibility precisely because permutation 
+importance is not biased toward high-cardinality continuous variables. 
+\texttt{host\_since\_year} again ranks third.
+
+The fact that \texttt{host\_acceptance\_rate} and \texttt{host\_since\_year} rank highly under 
+both criteria — despite the two measures capturing fundamentally different aspects of 
+feature utility — strengthens the case for treating them as genuinely informative signals 
+of large-scale host activity on the platform, rather than artefacts of the tree-growing 
+process.
+
+\subsection*{b) Partial Dependence Plots}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{figure}[H]
+\includegraphics[width=\maxwidth]{figure/pdp-1} \caption[Partial Dependence Plots]{Partial Dependence Plots}\label{fig:pdp}
+\end{figure}
+
+\end{knitrout}
+The contradictory treatment of \texttt{price} across the modelling approaches
+warranted further investigation; as did \texttt{host\_acceptance\_rate} given its 
+consistent top ranking across both variable importance criteria. Partial dependence plots 
+were therefore constructed for both features.
+
+Looking at Figure \ref{fig:pdp}, the PDP for \texttt{price} reveals a negative marginal relationship: lower-priced listings 
+are associated with a higher predicted probability of \texttt{highhost} status, with the 
+effect plateauing at higher price values. This is consistent with the hypothesis that 
+commercially scaled operators tend to concentrate in the cheaper, higher-volume segment 
+of the market, managing many modestly priced listings rather than fewer premium ones. The 
+elastic-net's exclusion of \texttt{price} is therefore likely a consequence of its 
+inability to capture this non-linear relationship within a linear decision boundary, rather 
+than evidence that price is genuinely uninformative.
+
+In contrast, the PDP\textsuperscript{\ref{fig:pdp}} for \texttt{host\_acceptance\_rate} exhibits a non-monotonic pattern. The predicted probability of \texttt{highhost} status peaks at intermediate acceptance rates, declines at very high levels, and remains elevated at very low levels.
+The high probability at elevated acceptance rates is intuitive: large-scale operators are likely to run more systematic, responsive operations. The elevated probability at low acceptance rates is less obvious, but may reflect a subset of high hosts who operate at scale and yet remain selective or slow to respond, potentially due to capacity constraints in managing large portfolios.
+
+\subsection*{c) Subsample of False-Positives and False-Negatives}
+Table \ref{tab:fp_sample} and Table \ref{tab:fn_sample} present five randomly sampled 
+false positives and false negatives respectively from the test set predictions of the 
+optimised Random Forest. Several patterns are discernible across both error types.
+
+All five false positives are entire home/apt listings, suggesting room type is a strong 
+but insufficient signal of commercial operation. Two record high prices (R6,558 and 
+R6,552), contrary to the negative price-\texttt{highhost} relationship identified in 
+the PDP, while low \texttt{availability\_30} values mimic the booking patterns of 
+commercial operators. Ward 115 appears twice, consistent with high-demand wards 
+inflating predicted \texttt{highhost} probabilities.
+
+Among the false negatives, the most notable observation is an extreme price of R26,000, 
+which the PDP associates with low \texttt{highhost} probability, misleading the model. 
+Three observations record zero \texttt{availability\_30}, suppressing predicted 
+commercial operation probabilities despite true \texttt{highhost} status. Across both 
+error types, misclassification tends to involve entire home/apt listings in high-demand 
+wards with atypical pricing or availability — features that serve as imperfect proxies 
+for host scale in isolation.
+
+\FloatBarrier
+\begin{table}[H]
+\centering
+\caption{Five Randomly Sampled False Positives from Test Set Predictions}
+\label{tab:fp_sample}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccccccc}
+\toprule
+\textbf{True} & \textbf{Year} & \textbf{Acceptance} & \textbf{Superhost} & \textbf{Ward} & \textbf{Room Type} & \textbf{Acc.} & \textbf{Beds} & \textbf{Price} & \textbf{Avail.} & \textbf{Reviews} & \textbf{Pred.} \\
+\textbf{Class} & \textbf{Joined} & \textbf{Rate (\%)} & & & & & & \textbf{(R)} & \textbf{(30d)} & & \\
+\midrule
+0 & 2016 & 88 & No  & Ward 54  & Entire home/apt & 6 & 3 & 6558  & 9  & 22 & 1 \\
+0 & 2020 & 77 & No  & Ward 30  & Entire home/apt & 2 & 0 & 317   & 30 & 7  & 1 \\
+0 & 2012 & 94 & No  & Ward 115 & Entire home/apt & 7 & 4 & 6552  & 7  & 21 & 1 \\
+0 & 2022 & 84 & Yes & Ward 115 & Entire home/apt & 4 & 2 & 2018  & 12 & 28 & 1 \\
+0 & 2017 & 95 & No  & Ward 115 & Entire home/apt & 2 & 1 & 830   & 0  & 25 & 1 \\
+\bottomrule
+\end{tabular}}
+\par\smallskip
+\footnotesize{\textit{Note:} Pred. = Predicted class. Acc. = Accommodates. Avail. = Availability. All observations were predicted as \texttt{highhost} (1) but belong to the low host class (0).}
+\end{table}
+
+\FloatBarrier
+\begin{table}[H]
+\centering
+\caption{Five Randomly Sampled False Negatives from Test Set Predictions}
+\label{tab:fn_sample}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccccccc}
+\toprule
+\textbf{True} & \textbf{Year} & \textbf{Acceptance} & \textbf{Superhost} & \textbf{Ward} & \textbf{Room Type} & \textbf{Acc.} & \textbf{Beds} & \textbf{Price} & \textbf{Avail.} & \textbf{Reviews} & \textbf{Pred.} \\
+\textbf{Class} & \textbf{Joined} & \textbf{Rate (\%)} & & & & & & \textbf{(R)} & \textbf{(30d)} & & \\
+\midrule
+1 & 2019 & 94  & Yes & Ward 115 & Entire home/apt & 2  & 1 & 1174  & 16 & 110 & 0 \\
+1 & 2018 & 100 & No  & Ward 113 & Entire home/apt & 4  & 2 & 604   & 10 & 26  & 0 \\
+1 & 2013 & 76  & Yes & Ward 74  & Entire home/apt & 10 & 5 & 26000 & 0  & 1   & 0 \\
+1 & 2015 & 93  & No  & Ward 74  & Entire home/apt & 2  & 1 & 1080  & 0  & 27  & 0 \\
+1 & 2021 & 94  & No  & Ward 77  & Entire home/apt & 2  & 1 & 646   & 0  & 7   & 0 \\
+\bottomrule
+\end{tabular}}
+\par\smallskip
+\footnotesize{\textit{Note:} Pred. = Predicted class. Acc. = Accommodates. Avail. = Availability. All observations are true \texttt{highhost}s (1) that were incorrectly predicted as low hosts (0).}
+\end{table}
+
+\begin{thebibliography}{1}
+
+\bibitem[Moodley et al.(2025)]{Moodley2025}
+Moodley, Doubell and Evans (2025)
+\newblock Opinion: Cape Town now has 26,000 Airbnbs -- but what are the rules?
+\newblock \textit{News24}, 21 September 2025.
+\newblock Available at: \url{https://www.news24.com/business/opinion/opinion-cape-town-now-has-26-000-airbnbs-but-what-are-the-rules-20250921-0671}
+\newblock [Accessed: 23 March 2026]
+
+\end{thebibliography}
+
+\end{document}
